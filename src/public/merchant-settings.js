@@ -170,7 +170,7 @@ function initApp() {
 
     // Initialize the application
     EcwidApp.init({
-        app_id: "ecwid-revolut-merchant-payment",
+        app_id: "custom-app-48334763-1",
         autoloadedflag: true,
         autoheight: true
     });
