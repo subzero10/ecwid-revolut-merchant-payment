@@ -1,0 +1,37 @@
+service: ecwid-revolut-merchant-payment
+app: ecwid-revolut-merchant-payment
+org: hiteqsoftware
+
+frameworkVersion: '2'
+configValidationMode: error
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  lambdaHashingVersion: 20201221
+  apiGateway:
+    shouldStartNameWithService: true
+
+functions:
+  makeOrder:
+    handler: handler.makeOrder
+    environment:
+      ECWID_CLIENT_SECRET: ${param:ECWID_CLIENT_SECRET}
+    events:
+    - httpApi:
+        path: /order/make
+        method: post
+
+  merchantSettingsHtml:
+    handler: handler.getMerchantSettingsView
+    events:
+      - http:
+          path: /merchant-settings
+          method: get
+
+  merchantSettingsJs:
+    handler: handler.getMerchantSettingsJs
+    events:
+      - http:
+          path: /merchant-settings.js
+          method: get

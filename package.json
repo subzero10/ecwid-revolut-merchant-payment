@@ -1,0 +1,24 @@
+{
+  "name": "ecwid-revolut-merchant-payment",
+  "version": "1.0.0",
+  "description": "Revolut Merchant API integration with Ecwid",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecwid",
+    "revolut",
+    "merchant",
+    "api",
+    "nodejs",
+    "payment",
+    "integration"
+  ],
+  "author": "pagcosma@gmail.com",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "serverless-aws-static-file-handler": "^2.0.7"
+  }
+}
