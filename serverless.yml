@@ -17,8 +17,6 @@ functions:
     handler: handler.makeOrder
     environment:
       ECWID_CLIENT_SECRET: ${param:ECWID_CLIENT_SECRET}
-      REVOLUT_MERCHANT_API_KEY: ${param:REVOLUT_MERCHANT_API_KEY}
-      REVOLUT_MERCHANT_ENDPOINT_ADDRESS: ${param:REVOLUT_MERCHANT_ENDPOINT_ADDRESS}
     events:
     - httpApi:
         path: /order/make

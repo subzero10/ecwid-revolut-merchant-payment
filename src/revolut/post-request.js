@@ -19,7 +19,7 @@ const postOrderRequest = async function (payload) {
 };
 
 const getOrderAmount = function (payload) {
-    return payload.cart.order.total;
+    return payload.cart.order.total * 100;
 };
 
 const getOrderCurrency = function (payload) {

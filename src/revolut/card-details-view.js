@@ -46,7 +46,7 @@ module.exports = {
             
             RevolutCheckout("${orderPublicId}", "${env}").then(function (RC) {
                 RC.payWithPopup({
-                    name: "",
+                    name: "todo",
                     email: "${viewParams.orderEmail}",
                     onSuccess() {
                         notifyEcwid("PAID");

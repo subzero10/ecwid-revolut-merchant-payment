@@ -6,6 +6,7 @@ const revolut = require('./revolut/post-request');
 const makeOrder = async function (event) {
     const body = getRequestBody(event.body);
     const payload = decryptor.getPayload(body);
+    console.log('payload', payload);
     return await revolut.postOrder(payload);
 };
 
