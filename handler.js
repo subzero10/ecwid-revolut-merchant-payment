@@ -6,6 +6,17 @@ const clientFilesPath = path.join(__dirname, "./src/public/");
 const fileHandler = new staticFileHandler(clientFilesPath);
 
 const makeOrder = require('./src/make-order');
+const makeTestOrder = require('./src/revolut/make-test-order');
+
+const respondWithHtml = (statusCode, bodyStr) => {
+    return {
+        statusCode,
+        headers: {
+            'Content-Type': 'text/html',
+        },
+        body: bodyStr
+    };
+};
 
 module.exports = {
     makeOrder: async (event) => {
@@ -18,13 +29,22 @@ module.exports = {
             statusCode = error.code ? error.code : 500;
             result = {message: error.message};
         }
-        return {
-            statusCode,
-            headers: {
-                'Content-Type': 'text/html',
-            },
-            body: result
-        };
+
+        return respondWithHtml(statusCode, result);
+    },
+
+    makeTestOrder: async (event) => {
+        let statusCode = 200;
+        let result;
+        try {
+            result = await makeTestOrder(event);
+        } catch (error) {
+            console.error(error);
+            statusCode = error.code ? error.code : 500;
+            result = {message: error.message};
+        }
+
+        return respondWithHtml(statusCode, result);
     },
 
     getMerchantSettingsView: (event) => {

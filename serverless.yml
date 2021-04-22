@@ -13,6 +13,13 @@ provider:
     shouldStartNameWithService: true
 
 functions:
+  makeTestOrder:
+    handler: handler.makeTestOrder
+    events:
+      - httpApi:
+          path: /order/make/test
+          method: get
+
   makeOrder:
     handler: handler.makeOrder
     environment:

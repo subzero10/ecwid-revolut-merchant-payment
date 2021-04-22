@@ -1,9 +1,13 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const config = require('./config');
+const {getOrderCurrency, getOrderAmount} = require("../ecwid/payload-helpers");
 
 const getCardDetailsViewParams = function (payload) {
     return {
+        sum: getOrderCurrency(payload) + (getOrderAmount(payload) / 100),
         orderEmail: payload.cart.order.email,
         orderToken: payload.token,
         storeId: payload.storeId,
@@ -18,6 +22,27 @@ const isProdRequest = function (payload) {
 }
 
 module.exports = {
+    buildV2: function (orderPublicId, ecwidOrderPayload) {
+        return new Promise((resolve, reject) => {
+            const viewParams = getCardDetailsViewParams(ecwidOrderPayload);
+            const env = isProdRequest(ecwidOrderPayload) ? 'sandbox' : 'prod';
+            fs.readFile(path.resolve('../public/pay-by-card.html'), 'utf8', (err, data) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                const result = data.replace('{viewParams.returnUrl}', viewParams.returnUrl)
+                    .replace('{viewParams.orderToken}', viewParams.orderToken)
+                    .replace('{viewParams.referenceTransactionId}', viewParams.referenceTransactionId)
+                    .replace('{viewParams.orderEmail}', viewParams.orderEmail)
+                    .replace('{viewParams.storeId}', viewParams.storeId)
+                    .replace('{viewParams.orderPublicId}', orderPublicId)
+                    .replace('{viewParams.env}', env);
+
+                resolve(result);
+            });
+        });
+    },
     build: function (orderPublicId, ecwidOrderPayload) {
         const viewParams = getCardDetailsViewParams(ecwidOrderPayload);
         const env = isProdRequest(ecwidOrderPayload) ? 'sandbox' : 'prod';

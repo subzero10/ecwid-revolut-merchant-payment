@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay by Card</title>
+
+    <style>
+        html {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+            Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            font-size: 16px;
+            background-color: #111;
+            color: #fff;
+        }
+
+        body {
+            padding: 20px 20px 60px;
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        :link {
+            color: royalblue;
+        }
+
+        :visited {
+            color: darkorchid;
+        }
+
+        .form-fieldset {
+            padding: 1rem;
+            border-radius: 13px;
+            border: 1px solid #333;
+        }
+
+        .form-fieldset + .form-fieldset {
+            margin-top: 1rem;
+        }
+
+        .form-field {
+            appearance: none;
+            box-sizing: border-box;
+            font-size: 16px;
+            display: block;
+            width: 100%;
+            height: 42px;
+            margin: 0.5rem 0;
+            padding: 0.5rem 0.75rem;
+            color: #fff;
+            border: 1px solid #222;
+            background-color: #222;
+            border-radius: 13px;
+            outline: none;
+        }
+
+        .form-field::placeholder {
+            color: #666;
+        }
+
+        .form-field:focus,
+        .form-field.rc-card-field--focused {
+            border-color: royalblue;
+        }
+
+        .form-field:invalid,
+        .form-field.rc-card-field--invalid {
+            border-color: red;
+        }
+
+        .form-field:required:valid,
+        .form-field.rc-card-field--completed {
+            border-color: lime;
+        }
+
+        .form-field-error-message {
+            color: red;
+        }
+
+        /**
+         * How to style autofilled fields:
+         * @see https://css-tricks.com/snippets/css/change-autocomplete-styles-webkit-browsers/
+         */
+        .form-field:-webkit-autofill,
+        .form-field.rc-card-field--autofilled {
+            border-color: yellow;
+            -webkit-text-fill-color: white;
+            -webkit-box-shadow: 0 0 0px 1000px #222 inset;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+    </style>
+</head>
+<body>
+<h2>Checkout ({sum})</h2>
+<form>
+    <fieldset class="form-fieldset">
+        <label>
+            <div>Name</div>
+            <input
+                    class="form-field"
+                    name="name"
+                    autoComplete="name"
+                    placeholder="Name"
+                    required
+            />
+        </label>
+        <label>
+            <div>Email</div>
+            <input
+                    class="form-field"
+                    name="email"
+                    value="{viewParams.orderEmail}"
+                    autoComplete="email"
+                    placeholder="Email"
+                    required
+            />
+        </label>
+        <label>
+            <div>Card</div>
+            <div class="form-field" id="card-element"></div>
+            <p class="form-field-error-message">
+            </p>
+        </label>
+    </fieldset>
+    <button style='display: "block"; margin: "1rem auto"'>
+        Pay {sum}
+    </button>
+</form>
+
+<script>!function(e,o,t){e[t]=function(n,r){var c={sandbox:"https://sandbox-merchant.revolut.com/embed.js",prod:"https://merchant.revolut.com/embed.js",dev:"https://merchant.revolut.codes/embed.js"},d=o.createElement("script");d.id="revolut-checkout",d.src=c[r]||c.prod,d.async=!0,o.head.appendChild(d);var s={then:function(r,c){d.onload=function(){r(e[t](n))},d.onerror=function(){o.head.removeChild(d),c&&c(new Error(t+" is failed toload"))}}};return"function"==typeof Promise?Promise.resolve(s):s}}(window,document,"RevolutCheckout");</script>
+
+<script>
+    function notifyEcwid(paymentStatus, errorMessage) {
+        const xhttp = new XMLHttpRequest();
+        xhttp.onload = function () {
+            let returnUrl = "{viewParams.returnUrl}";
+            if (errorMessage || xhttp.status !== 200) {
+                const errorMsg = errorMessage || xhttp.statusText;
+                returnUrl = returnUrl + '&errorMsg=' + encodeURI(errorMsg);
+            }
+            window.location = returnUrl;
+        };
+        const url = "https://app.ecwid.com/api/v3/{viewParams.storeId}/orders/{viewParams.referenceTransactionId}?token={viewParams.orderToken}";
+        xhttp.open("PUT", url, true);
+        xhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhttp.send(JSON.stringify({ "paymentStatus": paymentStatus }));
+    }
+</script>
+
+<script>
+    RevolutCheckout("{viewParams.orderPublicId}", "{viewParams.env}").then(RC => {
+        RC.createCardField({
+            target: document.getElementById("card-element"),
+            hidePostcodeField: true,
+            styles: {
+                default: {
+                    color: "#fff",
+                    "::placeholder": {
+                        color: "#666"
+                    }
+                },
+                autofilled: {
+                    color: "#fff"
+                }
+            },
+            onValidation(errors) {
+                console.error('validation', errors);
+            },
+            onSuccess() {
+                console.log('success');
+            },
+            onError(error) {
+                console.error(error);
+            },
+            onCancel() {
+                console.log('cancelled');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
